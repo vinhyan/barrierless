@@ -45,7 +45,7 @@ program
   .argument('<text>', 'Text to translate')
   .option('-l, --language <lang>', 'Target language for translation', 'en')
   .action(async (text, options) => {
-    console.log(chalk.blue(`Translating  ${text}...`));
+    console.log(chalk.blue(`Translating ${text}...`));
 
     await main(text, options.language);
   });
