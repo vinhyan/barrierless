@@ -14,31 +14,40 @@ Barrierless is a command-line tool designed to break down language barriers by p
 
 ### Installation
 
-- Clone the repository and navigate to the project directory:
+1. Clone the repository and navigate to the project directory:
 
 ```
 git clone git@github.com:vinhyan/barrierless.git
 ```
 
-- Navigate to the project directory:
+2. Navigate to the project directory:
 
 ```
 cd barrierless
 ```
 
-- Install the required dependencies:
+3. Install the required dependencies:
 
 ```
 npm install
 ```
+4. Create a `.env` file to store Groq API Key  
+_Note: refer to `.env.example` for instruction on how to obtain and store Groq API Key_
 
+5. Omit this step if `npm install -g` was used in step 3. Otherwise, run:
+```
+npm link
+```
 ### Running the Tool
 
 ```
-barrierless <text> [-l <target language>]
+bl-bot <text> [-l <target language>]
 ```
 
 _Note: If no target language specified, it is default to English_
+
+#### Arguments
+- `<text>`: The text that needs to be translated (required)
 
 #### Options
 
@@ -53,7 +62,7 @@ _Note: If no target language specified, it is default to English_
 **CLI:**
 
 ```
-barrierless-bot 你好 -l spanish
+bl-bot 你好 -l spanish
 ```
 
 **Output:**
@@ -68,7 +77,7 @@ The translation of "你好" (nǐ hǎo) to Spanish is "Hola".
 **CLI:**
 
 ```
-barrierless-bot bonjour
+bl-bot bonjour
 ```
 
 **Output:**
