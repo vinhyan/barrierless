@@ -13,10 +13,8 @@ dotenv.config();
 // Command-line tool setup with commander
 const program = new Command();
 program
-  .name('barrierless-bot')
-  .description(
-    'A CLI tool that translates a text to a target language using GroqCloud.'
-  )
+  .name(`${name}`)
+  .description(`${description}`)
   .version(`${name}: ${version}`, '-v, --version', 'Barrierless Bot version');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -25,7 +23,7 @@ export async function main(text, targetLang) {
   const chatCompletion = await getGroqChatCompletion(text, targetLang);
   console.log(chatCompletion.choices[0]?.message?.content || '');
 }
-
+``;
 export async function getGroqChatCompletion(text, targetLang) {
   return groq.chat.completions.create({
     messages: [
