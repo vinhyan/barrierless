@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
+const require = createRequire(import.meta.url); // to use 'require' syntax due to certain packages not supporting ES6 imports ('chalk' and package.json)
 const { name, version, description } = require('../package.json');
 const { Command } = require('commander');
 import chalk from 'chalk';
