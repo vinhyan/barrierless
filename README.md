@@ -31,13 +31,16 @@ cd barrierless
 ```
 npm install
 ```
+
 4. Create a `.env` file to store Groq API Key  
-_Note: refer to `.env.example` for instruction on how to obtain and store Groq API Key_
+   _Note: refer to `.env.example` for instruction on how to obtain and store Groq API Key_
 
 5. Omit this step if `npm install -g` was used in step 3. Otherwise, run:
+
 ```
 npm link
 ```
+
 ### Running the Tool
 
 ```
@@ -47,7 +50,8 @@ bl-bot <text> [-l <target language>]
 _Note: If no target language specified, it is default to English_
 
 #### Arguments
-- `<text>`: The text that needs to be translated (required)
+
+- `<text>`: The text that needs to be translated (required). Enclosed in quotes if more than one word (e.g. "Hello, world!")
 
 #### Options
 
