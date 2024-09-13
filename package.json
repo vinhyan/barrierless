@@ -8,7 +8,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "A CLI tool that translates a text to a target language using GroqCloud.",
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
@@ -17,6 +17,6 @@
   },
   "type": "module",
   "bin": {
-    "barrierless-bot": "./src/index.js"
+    "bl-bot": "./src/index.js"
   }
 }
