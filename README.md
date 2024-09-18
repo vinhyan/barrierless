@@ -2,7 +2,7 @@
 
 Barrierless is a command-line tool designed to break down language barriers by providing seamless translations from one language to another. Powered by GROQCloud, this tool allows users to quickly translate text files into their desired target language, making communication across different languages effortless.
 
-![barrierless-demo](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW5hcGswOHJ0d3oxMzUycWQ1M3JmcWs0aDU4cHo3cTc3ZXJyenB2cyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lzAaDxEol2rhrSm3nS/giphy.gif)
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vdp44fsu4iljnv42fxa9.gif)
 
 ## Features
 
