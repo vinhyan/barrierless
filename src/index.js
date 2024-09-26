@@ -1,64 +1,15 @@
 #!/usr/bin/env node
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url); // to use 'require' syntax due to certain packages not supporting ES6 imports ('chalk' and package.json)
+const require = createRequire(import.meta.url);
 const { name, version, description } = require('../package.json');
-const { Command } = require('commander');
+import { Command } from 'commander';
 import chalk from 'chalk';
-import Groq from 'groq-sdk';
-import { prompt } from './prompt.js';
 import fs from 'fs/promises';
-const path = require('path');
-
+import { getGroqChatCompletion } from './ai_providers/groq_ai.js';
+import { getGeminiChatCompletion } from './ai_providers/gemini_ai.js';
+import { txtFilenameExt, capFirstLetter } from './util.js';
 import dotenv from 'dotenv';
 dotenv.config();
-
-// **** Helper functions ****
-// Get GROQ chat completion
-const apiKey = process.env.GROQ_API_KEY;
-
-export async function getGroqChatCompletion(
-  fileContent,
-  targetLang,
-  providerModel
-) {
-  try {
-    if (!apiKey) {
-      throw new Error(
-        'GROQ API key not found. Please set the GROQ_API_KEY environment variable in .env.'
-      );
-    }
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-    return groq.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: prompt(fileContent, targetLang),
-        },
-      ],
-      model: providerModel,
-      temperature: 0.2, // value between 0 and 2. the lower is more deterministic, higher is more creative and random
-    });
-  } catch (err) {
-    console.error(
-      chalk.red('Error connecting to GROQ chat completion:', err.message)
-    );
-    process.exit(1);
-  }
-}
-
-// Check file extension to ensure it is a .txt file
-function txtFilenameExt(filename) {
-  const ext = path.extname(filename);
-  if (ext.toLocaleLowerCase() !== '.txt' || !ext) {
-    return path.format({
-      ...path.parse(filename),
-      base: undefined, // Remove the current base (name + ext)
-      ext: '.txt', // Add the .txt extension
-    });
-  }
-  return filename;
-}
 
 // Command-line tool setup with commander
 const program = new Command();
@@ -73,38 +24,72 @@ program
   .argument('<files...>', 'File(s) to translate')
   .option('-l, --language <lang>', 'Target language for translation', 'english')
   .option('-o, --output <files...>', 'Output filename(s)')
-  .option('-m, --model', 'AI provider model', 'llama3-8b-8192')
+  .option(
+    '-p, --provider <provider>',
+    'AI provider: enter "Groq" or "Gemini". Default is Groq'
+  )
+  .option('-m, --model <model>', 'AI provider model')
   .action(async (files, options) => {
     const targetLang = options.language;
     let isOutputProvided = options.output;
+    let translatedContent;
 
     try {
       const translatedContents = [];
+
+      if (options.provider) {
+        if (!(options.provider === 'groq' || options.provider === 'gemini')) {
+          throw new Error(
+            'Invalid AI provider. Please enter "Groq" or "Gemini".'
+          );
+        }
+      }
+      // Display provider
+      console.log(
+        chalk.green(
+          'Provider:',
+          options.provider ? capFirstLetter(options.provider) : 'Groq'
+        )
+      );
+
       for (const file of files) {
-        const fileContent = await fs.readFile(file, 'utf-8'); // read content from input file
-        const chatCompletion = await getGroqChatCompletion(
-          fileContent,
-          targetLang,
-          options.model
-        );
-        const translatedContent =
-          chatCompletion.choices[0]?.message?.content || '';
+        const fileContent = await fs.readFile(file, 'utf-8');
+
+        // Default provider is Groq
+        if (!options.provider || options.provider === 'groq') {
+          const groqCompletion = await getGroqChatCompletion(
+            fileContent,
+            targetLang,
+            options.model
+          );
+          translatedContent = groqCompletion.choices[0]?.message?.content || '';
+        } else {
+          const geminiCompletion = await getGeminiChatCompletion(
+            fileContent,
+            targetLang,
+            options.model
+          );
+          translatedContent = geminiCompletion.response.text();
+        }
+        // Store all translated contents in an array
         translatedContents.push(translatedContent);
+
+        // Print translated content to console if no output file(s) option provided
         if (!isOutputProvided) {
           console.log(chalk.blue(`*** Translating "${file}"... ***`));
           console.log(translatedContent);
         }
       }
-      // if outfile(s) provided, write translated content to file(s)
+      // If output file(s) provided, write translated content to file(s)
       if (isOutputProvided) {
         let outputFilename;
         for (let i = 0; i < options.output.length; i++) {
-          // check if output filename contains .txt. If not, append .txt to the filename
+          // Check if output filename contains .txt. If not, append .txt to the filename
           outputFilename = txtFilenameExt(options.output[i]);
           await fs.writeFile(outputFilename, translatedContents[i], 'utf-8');
           console.log(
             chalk.blue(
-              `*** ${options.output[i]} is translated and saved to "${outputFilename}"... ***`
+              `*** ${options.output[i]} is translated and saved to "${outputFilename}" ***`
             )
           );
         }
