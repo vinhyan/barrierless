@@ -110,8 +110,14 @@ program
         }
       }
       console.log(chalk.green('*** Done! ***'));
+      process.exit(0);
     } catch (err) {
-      console.error(chalk.red('Error translating text:', err.message));
+      console.error(
+        chalk.red(
+          'Error translating text: ',
+          err.error?.error?.message || err.message
+        )
+      );
       process.exit(1);
     }
   });
