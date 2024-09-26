@@ -8,7 +8,7 @@ Barrierless is a command-line tool designed to break down language barriers by p
 
 - Auto-detects languages.
 - Multiple Language Support: Translate text between a wide range of languages.
-- GROQCloud Integration: Utilizes GROQCloud's high-performance translation API.
+- Now supporting [GROQCloud](https://console.groq.com/docs/) and [GeminiAI](https://ai.google.dev/gemini-api/docs)
 - Easy to Use: Simple command-line interface for quick translations.
 - Customizable: Easily extendable for additional language features or API support.
 
@@ -117,7 +117,7 @@ Provider: Groq
 *** Done! ***
 ```
 
-4. Translate a text file in English to Spanish, using GeminiAI provider:
+4. Translate a text file in English and Chinese to Spanish, using GeminiAI provider:
 
 **CLI:**
 
