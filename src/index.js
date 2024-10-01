@@ -7,9 +7,7 @@ import chalk from 'chalk';
 import fs from 'fs/promises';
 import { getGroqChatCompletion } from './ai_providers/groq_ai.js';
 import { getGeminiChatCompletion } from './ai_providers/gemini_ai.js';
-import { txtFilenameExt, capFirstLetter } from './util.js';
-import dotenv from 'dotenv';
-dotenv.config();
+import { txtFilenameExt, capFirstLetter, getConfig } from './util.js';
 
 // Command-line tool setup with commander
 const program = new Command();
@@ -30,7 +28,10 @@ program
   )
   .option('-m, --model <model>', 'AI provider model')
   .action(async (files, options) => {
-    const targetLang = options.language;
+    const config = getConfig();
+
+    // Prefer the command-line input for language, but use the config file's value if there's no command-line input
+    const targetLang = options.language || config.preferences.language;
     let isOutputProvided = options.output;
     let translatedContent;
 
