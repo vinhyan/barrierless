@@ -9,7 +9,14 @@ export function getConfig() {
   const os = require('os');
   const fs = require('fs');
   const __homedir = os.homedir();
-  const tomlFilePath = path.join(__homedir, '.barrierless');
+
+  // Look for the relevant TOML file in home directory
+  const tomlFilePath = path.join(__homedir, '.barrierless.toml');
+
+  // If the file doesn't exist, no need to parse the file for defaults
+  if (!fs.existsSync(tomlFilePath)) {
+    return null;
+  }
 
   let config = {};
   try {
@@ -17,8 +24,11 @@ export function getConfig() {
     config = toml.parse(configFileContent);
   } catch (error) {
     console.error(`Error reading TOML file: ${error.message}`);
+    // If there was an error with parsing an existing file, exit.
+    exit(1);
   }
 
+  // Returns config values that were parsed from .barrierless.toml
   return config;
 }
 
