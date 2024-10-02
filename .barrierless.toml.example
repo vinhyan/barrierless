@@ -1,0 +1,11 @@
+# .barrierless.toml.example
+
+[api_keys]
+  # Obtain your API key from https://www.sanity.io/account/api and set it below:
+  GROQ_API_KEY = "GROQ_API_KEY"
+
+  # Obtain your API key 
+  GEMINI_API_KEY = "GEMINI_API_KEY"
+
+[preferences]
+  LANGUAGE = "french"
