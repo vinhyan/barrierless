@@ -20,7 +20,7 @@ program
 program
   .description('Translates file(s) using GROQCloud')
   .argument('<files...>', 'File(s) to translate')
-  .option('-l, --language <lang>', 'Target language for translation', 'english')
+  .option('-l, --language <lang>', 'Target language for translation')
   .option('-o, --output <files...>', 'Output filename(s)')
   .option(
     '-p, --provider <provider>',
@@ -31,7 +31,7 @@ program
     const config = getConfig();
 
     // Prefer the command-line input for language, but use the config file's value if there's no command-line input
-    const targetLang = options.language || config.preferences.language || process.env.language;
+    const targetLang = options.language || config?.preferences?.language || process.env.LANGUAGE || 'english';
     let isOutputProvided = options.output;
     let translatedContent;
 
