@@ -6,7 +6,10 @@ import { prompt } from '../prompt.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+import { getConfig } from '../util.js';
+const config = getConfig();
+const GEMINI_API_KEY =
+  config.api_keys.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
 
 export async function getGeminiChatCompletion(
   fileContent,

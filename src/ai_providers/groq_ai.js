@@ -4,7 +4,9 @@ import { prompt } from '../prompt.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+import { getConfig } from '../util.js';
+const config = getConfig();
+const GROQ_API_KEY = config.api_keys.GROQ_API_KEY || process.env.GROQ_API_KEY;
 
 export async function getGroqChatCompletion(
   fileContent,
