@@ -31,7 +31,7 @@ program
     const config = getConfig();
 
     // Prefer the command-line input for language, but use the config file's value if there's no command-line input
-    const targetLang = options.language || config?.preferences?.language || process.env.LANGUAGE || 'english';
+    const targetLang = options.language || config?.preferences?.LANGUAGE || process.env.LANGUAGE || 'english';
     let isOutputProvided = options.output;
     let translatedContent;
 
