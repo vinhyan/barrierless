@@ -2,11 +2,11 @@ import chalk from 'chalk';
 import Groq from 'groq-sdk';
 import { prompt } from '../prompt.js';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config(); // loads the variables from the .env file in the Current Working Directory
 
 import { getConfig } from '../util.js';
 const config = getConfig();
-const GROQ_API_KEY = config.api_keys.GROQ_API_KEY || process.env.GROQ_API_KEY;
+const GROQ_API_KEY = config?.api_keys?.GROQ_API_KEY || process.env.GROQ_API_KEY;
 
 export async function getGroqChatCompletion(
   fileContent,
