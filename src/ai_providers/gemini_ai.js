@@ -4,9 +4,12 @@ import chalk from 'chalk';
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 import { prompt } from '../prompt.js';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config(); // loads the variables from the .env file in the Current Working Directory
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+import { getConfig } from '../util.js';
+const config = getConfig();
+const GEMINI_API_KEY =
+  config?.api_keys?.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
 
 export async function getGeminiChatCompletion(
   fileContent,
