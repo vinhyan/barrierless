@@ -4,7 +4,7 @@ import { prompt } from '../prompt.js';
 import dotenv from 'dotenv';
 dotenv.config(); // loads the variables from the .env file in the Current Working Directory
 
-import { getConfig } from '../util.js';
+import { getConfig } from '../utils.js';
 const config = getConfig();
 const GROQ_API_KEY = config?.api_keys?.GROQ_API_KEY || process.env.GROQ_API_KEY;
 
@@ -21,7 +21,7 @@ export async function getGroqChatCompletion(
     }
     const groq = new Groq({ apiKey: GROQ_API_KEY });
 
-    return groq.chat.completions.create({
+    const res = await groq.chat.completions.create({
       messages: [
         {
           role: 'user',
@@ -31,6 +31,8 @@ export async function getGroqChatCompletion(
       model: providerModel || 'llama3-8b-8192',
       temperature: 0.2, // value between 0 and 2. the lower is more deterministic, higher is more creative and random
     });
+
+    return res.choices[0]?.message?.content || '';
   } catch (err) {
     console.error(chalk.red('Error connecting to GROQ:', err.message));
     process.exit(1);

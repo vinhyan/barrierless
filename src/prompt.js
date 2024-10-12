@@ -1,5 +1,3 @@
-// export const prompt = "Translate to English";
-
 export const prompt = (fileContent, targetLang) => {
-  return `Translate ${fileContent} to ${targetLang}. Do not provide any context or additional information.`;
+  return `Translate this content: ${fileContent} to the ${targetLang} language. Do not provide any context or additional information.`;
 };

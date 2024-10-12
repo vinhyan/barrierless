@@ -6,7 +6,7 @@ import { prompt } from '../prompt.js';
 import dotenv from 'dotenv';
 dotenv.config(); // loads the variables from the .env file in the Current Working Directory
 
-import { getConfig } from '../util.js';
+import { getConfig } from '../utils.js';
 const config = getConfig();
 const GEMINI_API_KEY =
   config?.api_keys?.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
@@ -26,7 +26,9 @@ export async function getGeminiChatCompletion(
     const model = genAI.getGenerativeModel({
       model: providerModel || 'gemini-1.5-flash',
     });
-    return await model.generateContent(prompt(fileContent, targetLang));
+
+    const res = await model.generateContent(prompt(fileContent, targetLang));
+    return await res.response.text();
   } catch (err) {
     console.error(chalk.red('Error connecting to GEMINI:', err.message));
     process.exit(1);
