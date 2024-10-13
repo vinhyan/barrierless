@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import { getGroqChatCompletion } from './ai/groq_ai.js';
 import { getGeminiChatCompletion } from './ai/gemini_ai.js';
 import {
+  displayBanner,
   capFirstLetter,
   getConfig,
   displayTranslatedContents,
@@ -18,7 +19,7 @@ async function main() {
     groq: getGroqChatCompletion,
     gemini: getGeminiChatCompletion,
   };
-  
+
   const { options, args } = argParser(); // args = files to translate
   const config = getConfig();
 
@@ -36,8 +37,11 @@ async function main() {
     if (!AI_PROVIDERS[provider]) {
       throw new Error('Invalid AI provider. Please enter "Groq" or "Gemini".');
     }
+
+    // Display banner
+    displayBanner();
+
     // Display provider
-    console.log('\n');
     console.log(chalk.green('Provider:'), capFirstLetter(provider));
 
     // Parse files
@@ -56,14 +60,11 @@ async function main() {
       ? outputHandler(translatedFiles)
       : displayTranslatedContents(translatedFiles);
 
-    console.log(chalk.green('*** Done! ***'));
+    console.log(chalk.green('====== Done ======'));
     process.exit(0);
   } catch (err) {
     console.error(
-      chalk.red(
-        'Error translating text: ',
-        err.error?.error?.message || err.message
-      )
+      chalk.red('Error: ', err.error?.error?.message || err.message)
     );
     process.exit(1);
   }

@@ -8,6 +8,19 @@ import chalk from 'chalk';
 import os from 'os';
 import fs from 'fs';
 
+// Display banner
+export function displayBanner() {
+  console.log(
+    chalk.blue(`
+ ____                  _           _               
+| __ )  __ _ _ __ _ __(_) ___ _ __| | ___  ___ ___ 
+|  _ \\ / _\` | '__| '__| |/ _ \\ '__| |/ _ \\/ __/ __|
+| |_) | (_| | |  | |  | |  __/ |  | |  __/\\__ \\__ \\
+|____/ \\__,_|_|  |_|  |_|\\___|_|  |_|\\___||___/___/
+`)
+  );
+}
+
 // Retrieve the values within the TOML config file (.barrierless), and export them as the `config` object
 export function getConfig() {
   // Logic to read the values from the .barrierless config file in the home directory
