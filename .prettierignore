@@ -1,0 +1,12 @@
+# Ignore artifacts:
+build
+coverage
+.git/
+.github/
+.husky/
+.vscode/
+node_modules/
+package.json
+package-lock.json
+examples/
+

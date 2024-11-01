@@ -1,17 +1,18 @@
 #!/usr/bin/env node
-import chalk from 'chalk';
-import { getGroqChatCompletion } from './ai/groq_ai.js';
-import { getGeminiChatCompletion } from './ai/gemini_ai.js';
+import chalk from "chalk";
+import process from "node:process";
+import { getGroqChatCompletion } from "./ai/groq_ai.js";
+import { getGeminiChatCompletion } from "./ai/gemini_ai.js";
 import {
   displayBanner,
   capFirstLetter,
   getConfig,
   displayTranslatedContents,
-} from './utils.js';
-import fileParser from './input/fileParser.js';
-import translateFiles from './translation/translateFiles.js';
-import outputHandler from './output/outputHandler.js';
-import argParser from './cli/argParser.js';
+} from "./utils.js";
+import fileParser from "./input/fileParser.js";
+import translateFiles from "./translation/translateFiles.js";
+import outputHandler from "./output/outputHandler.js";
+import argParser from "./cli/argParser.js";
 
 async function main() {
   // AI Providers
@@ -28,10 +29,10 @@ async function main() {
     options.language ||
     config?.preferences?.LANGUAGE ||
     process.env.LANGUAGE ||
-    'english';
+    "english";
 
   // Chosen AI provider
-  const provider = options.provider || 'groq';
+  const provider = options.provider || "groq";
 
   try {
     if (!AI_PROVIDERS[provider]) {
@@ -42,7 +43,7 @@ async function main() {
     displayBanner();
 
     // Display provider
-    console.log(chalk.green('Provider:'), capFirstLetter(provider));
+    console.log(chalk.green("Provider:"), capFirstLetter(provider));
 
     // Parse files
     const parsedFiles = await fileParser(args);
@@ -52,7 +53,7 @@ async function main() {
       parsedFiles,
       targetLang,
       getGeminiChatCompletion,
-      options.model
+      options.model,
     );
 
     // Output or display translated contents
@@ -60,11 +61,11 @@ async function main() {
       ? outputHandler(translatedFiles)
       : displayTranslatedContents(translatedFiles);
 
-    console.log(chalk.green('====== Done ======'));
+    console.log(chalk.green("====== Done ======"));
     process.exit(0);
   } catch (err) {
     console.error(
-      chalk.red('Error: ', err.error?.error?.message || err.message)
+      chalk.red("Error: ", err.error?.error?.message || err.message),
     );
     process.exit(1);
   }

@@ -1,20 +1,20 @@
-import chalk from 'chalk';
-import { getIso639LanguageCode, capFirstLetter } from '../utils.js';
-import path from 'path';
+import chalk from "chalk";
+import { getIso639LanguageCode, capFirstLetter } from "../utils.js";
+import path from "path";
 
 export default async function translateFiles(
   parsedFiles,
   targetLang,
   aiProvider,
-  aiModel
+  aiModel,
 ) {
   const targetLangCode = getIso639LanguageCode(targetLang);
   console.log(
     chalk.blue(
       `🔄 Translating file(s) to ${chalk.yellow(
-        capFirstLetter(targetLang)
-      )}... `
-    )
+        capFirstLetter(targetLang),
+      )}... `,
+    ),
   );
   const translatedFiles = [];
 
@@ -26,7 +26,7 @@ export default async function translateFiles(
       // Edit filename to include targetLangCode
       const translatedFileName = getTranslatedFileName(
         file_name,
-        targetLangCode
+        targetLangCode,
       );
 
       translatedFiles.push({
