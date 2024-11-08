@@ -18,8 +18,11 @@ export default async function translateFiles(
   );
   const translatedFiles = [];
 
-  for (let i = 0; i < parsedFiles.length; i++) {
-    const { file_name, content } = parsedFiles[i];
+  // [TODO] consider using something like https://www.npmjs.com/package/p-queue to run them in parallel,
+  // but constrain how many actually run at once, for API limits.
+
+  const translationPromises = parsedFiles.map(async (file) => {
+    const { file_name, content } = file;
     try {
       const translatedContent = await aiProvider(content, targetLang, aiModel);
 
@@ -36,7 +39,17 @@ export default async function translateFiles(
     } catch (error) {
       console.error(chalk.red(`*** Error: ${error.message} ***`));
     }
+  });
+  
+  // Promise.all will wait until all promises in the array are resolved, then will 
+  // resolve itself it all promises are resolved successfully, or reject if any of 
+  // the promises are rejected.
+  try {
+      await Promise.all(translationPromises);
+  } catch(error) {
+      console.error(chalk.red(`*** Error: ${error.message} ***`));
   }
+
   return translatedFiles;
 }
 
