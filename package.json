@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "test": "jest --",
-    "test:watch": "jest --watch --",
-    "coverage": "jest --collectCoverage --",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --",
+    "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --collectCoverage --",
     "format": "prettier --write .",
     "lint": "eslint ."
   },
@@ -32,6 +32,7 @@
     "eslint": "^9.14.0",
     "globals": "^15.11.0",
     "jest": "^29.7.0",
+    "nock": "^13.5.5",
     "prettier": "3.3.3"
   }
 }

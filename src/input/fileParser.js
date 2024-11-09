@@ -1,36 +1,12 @@
-import fs from "fs/promises";
 import chalk from "chalk";
-import path from "path";
+import { parseFiles } from "./file.js";
 
 export default async function fileParser(files) {
   console.log(chalk.blue(`📂 Reading file(s)... `));
-  const parsedFiles = [];
-
-  const parseFilePromises = files.map(async (file, index) => {
-    const parsedFile = {};
-    const fileName = path.basename(file);
-    try {
-      console.log(chalk.yellow(`   ${index + 1}/${files.length}: ${fileName}`));
-      const fileContent = await fs.readFile(file, "utf-8");
-      // Store file name and file content in a key-pair object
-      parsedFile["file_name"] = fileName;
-      parsedFile["content"] = fileContent;
-      parsedFiles.push(parsedFile);
-    } catch (error) {
-      console.error(
-        chalk.red(
-          `*** Error: Unable to read "${fileName}". Skipping this file... ***`,
-        ),
-      );
-      console.error(error.message);
-    }
-  });
-
   try {
-    await Promise.all(parseFilePromises);
+    const parsedFiles = await parseFiles(files);
+    return parsedFiles;
   } catch (error) {
     console.error(chalk.red(`*** Error: ${error.message} ***`));
   }
-
-  return parsedFiles;
 }
