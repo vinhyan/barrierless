@@ -1,4 +1,4 @@
-import { beforeAll, jest } from "@jest/globals";
+import { beforeAll, describe, jest } from "@jest/globals";
 
 const mockFiles = {};
 
@@ -17,28 +17,33 @@ jest.unstable_mockModule("node:fs/promises", () => ({
 }));
 
 const fsPromises = await import("node:fs/promises");
-const { parseFiles } = await import("../../src/input/file");
-const { validate } = await import("../../src/input/file");
+const { validateFiles, parseFiles } = await import("../../src/input/file");
 
-describe("Validate() tests", () => {
-  test("file name is blank, return false", () => {
-    expect(validate("")).toBe(false);
+describe("validateFiles() tests", () => {
+  test("files is null, return false", () => {
+    expect(validateFiles(null)).toBe(false);
   });
 
-  test("file is a .txt, return true", () => {
-    expect(validate("dummy_file.txt")).toBe(true);
+  test("files is an empty array, return true", () => {
+    expect(validateFiles([])).toBe(false);
   });
 
-  test("file is not a .txt, return false", () => {
-    expect(validate("dummy_file.md")).toBe(false);
+  test("files contain one invalid file, return false", () => {
+    expect(validateFiles(["dummy_file.txt", "dummy_file.md"])).toBe(false);
   });
 
-  test("file is null, return false", () => {
-    expect(validate(null)).toBe(false);
+  test("files contain all valid file, return true", () => {
+    expect(
+      validateFiles([
+        "dummy_file_1.txt",
+        "dummy_file_2.txt",
+        "dummy_file_3.txt",
+      ]),
+    ).toBe(true);
   });
 });
 
-describe("ParseFiles() tests", () => {
+describe("parseFiles() tests", () => {
   const mdFilepath = "dummy_file.md";
   const mdFileData = "This is a markdown file.";
 
@@ -46,7 +51,6 @@ describe("ParseFiles() tests", () => {
   const txtFileData = "This is a text file.";
 
   beforeAll(() => {
-    // Mock fsPromises.readFile to return the file data
     fsPromises.__setMockFileData(mdFilepath, mdFileData);
     fsPromises.__setMockFileData(txtFilepath, txtFileData);
   });
@@ -54,38 +58,31 @@ describe("ParseFiles() tests", () => {
   beforeEach(() => {
     // Clear all mocks before each test
     jest.clearAllMocks();
-    // fsPromises.__setMockFileData(mdFilepath, mdFileData);
-    // fsPromises.__setMockFileData(txtFilepath, txtFileData);
   });
 
-  test("fs is mocked", async () => {
-    // fsPromises.__setMockFileData("dummy_file.txt", "This is a text file.");
-    const result = await fsPromises.readFile(txtFilepath);
-    expect(result).toBe("This is a text file.");
+  test("no files provided, throw error", async () => {
+    await expect(parseFiles()).rejects.toThrow("No files provided.");
   });
 
-  test("files is an array with one txt file, return array.length = 1", async () => {
-    // fsPromises.__setMockFileData(mdFilepath, mdFileData);
-    // fsPromises.__setMockFileData(txtFilepath, txtFileData);
-    // await fsPromises.readFile("dummy_file.txt");
-    const result = await parseFiles([txtFilepath]);
-    expect(result[0]).toEqual({ file_name: txtFilepath, content: txtFileData });
+  test("files is null, throw error", async () => {
+    await expect(parseFiles()).rejects.toThrow("No files provided.");
   });
 
-  // test("files is not an array, throw error", async () => {
-  //   await expect(parseFiles(mdFilepath)).rejects.toThrow(
-  //     "Invalid input. No files provided.",
-  //   );
-  // });
+  test("one non-existent file provided, return empty array", async () => {
+    await expect(parseFiles(["non_existing.txt"])).resolves.toEqual([]);
+  });
 
-  // test("file is invalid (.md), return empty array", async () => {
-  //   const result = await parseFiles([mdFilepath]);
-  //   expect(result.length).toBe(0);
-  // });
+  test("multiple files provided but one is non-existent, return an array that excludes the unknown file", async () => {
+    const files = [txtFilepath, mdFilepath, "non_existing.txt"];
+    const result = await parseFiles(files);
+    expect(result.length).toBe(files.length - 1);
+    expect(result.filter((f) => f.file === "non_existing.txt").length).toBe(0);
+  });
 
-  // test("one out of n files is invalid, return array.length = n - 1", async () => {
-  //   const files = ["cn.txt", "es.txt", "vi.txt", "dummy_file.md"];
-  //   const result = await parseFiles(files);
-  //   expect(result.length).toBe(files.length - 1);
-  // });
+  test("files provided, return an array of parsed files", async () => {
+    const files = [txtFilepath, mdFilepath];
+    const result = await parseFiles(files);
+    expect(result[0]).toEqual({ file: txtFilepath, content: txtFileData });
+    expect(result[1]).toEqual({ file: mdFilepath, content: mdFileData });
+  });
 });

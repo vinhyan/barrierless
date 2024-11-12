@@ -1,13 +1,18 @@
 import chalk from "chalk";
 import { getIso639LanguageCode, capFirstLetter } from "../utils.js";
 import path from "path";
+import PQueue from "p-queue";
 
-export default async function translateFiles(
+
+export async function translateFiles(
   parsedFiles,
   targetLang,
   aiProvider,
   aiModel,
 ) {
+  if (!(parsedFiles && parsedFiles.length > 0)) {
+    throw new Error("No files provided.");
+  }
   const targetLangCode = getIso639LanguageCode(targetLang);
   console.log(
     chalk.blue(
@@ -18,45 +23,41 @@ export default async function translateFiles(
   );
   const translatedFiles = [];
 
-  // [TODO] consider using something like https://www.npmjs.com/package/p-queue to run them in parallel,
-  // but constrain how many actually run at once, for API limits.
+  const queue = new PQueue({ concurrency: 2 }); // process (translate) limit to 2 files concurrently to avoid API limits
 
-  const translationPromises = parsedFiles.map(async (file) => {
-    const { file_name, content } = file;
-    try {
-      const translatedContent = await aiProvider(content, targetLang, aiModel);
+  parsedFiles.forEach((file, index) => {
+    const { file: fileBase, content } = file;
 
-      // Edit filename to include targetLangCode
-      const translatedFileName = getTranslatedFileName(
-        file_name,
-        targetLangCode,
-      );
+    (async () => {
+      try {
+        console.log(
+          chalk.yellow(`   ${index + 1}/${parsedFiles.length}: ${fileBase}`),
+        );
+        const translatedContent = await queue.add(
+          async () => await aiProvider(content, targetLang, aiModel),
+        );
 
-      translatedFiles.push({
-        file_name: translatedFileName,
-        content: translatedContent,
-      });
-    } catch (error) {
-      console.error(chalk.red(`*** Error: ${error.message} ***`));
-    }
+        // Edit file base to include targetLangCode
+        const translatedFileName = getTranslatedFileBase(
+          fileBase,
+          targetLangCode,
+        );
+
+        translatedFiles.push({
+          file: translatedFileName,
+          content: translatedContent,
+        });
+      } catch (error) {
+        console.error(chalk.red(`*** Error: ${error.message} ***`));
+      }
+    })();
   });
-  
-  // Promise.all will wait until all promises in the array are resolved, then will 
-  // resolve itself it all promises are resolved successfully, or reject if any of 
-  // the promises are rejected.
-  try {
-      await Promise.all(translationPromises);
-  } catch(error) {
-      console.error(chalk.red(`*** Error: ${error.message} ***`));
-  }
+  await queue.onIdle();
 
   return translatedFiles;
 }
 
-function getTranslatedFileName(file_name, targetLangCode) {
-  // Get the file extension and file name without the extension
-  const fileExtension = path.extname(file_name);
-  const fileNameWithoutExt = path.basename(file_name, fileExtension); // Get the file name without extension
-
-  return `${fileNameWithoutExt}_${targetLangCode}${fileExtension}`;
+function getTranslatedFileBase(fileBase, targetLangCode) {
+  const { name, ext } = path.parse(fileBase);
+  return `${name}_${targetLangCode}${ext}`;
 }

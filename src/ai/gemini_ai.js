@@ -1,7 +1,7 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+// import { createRequire } from "module";
+// const require = createRequire(import.meta.url);
 import chalk from "chalk";
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { prompt } from "../prompt.js";
 import dotenv from "dotenv";
 dotenv.config(); // loads the variables from the .env file in the Current Working Directory
@@ -29,9 +29,8 @@ export async function getGeminiChatCompletion(
     });
 
     const res = await model.generateContent(prompt(fileContent, targetLang));
-    return await res.response.text();
+    return res.response.text();
   } catch (err) {
     console.error(chalk.red("Error connecting to GEMINI:", err.message));
-    process.exit(1);
   }
 }

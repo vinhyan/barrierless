@@ -9,9 +9,9 @@ import {
   getConfig,
   displayTranslatedContents,
 } from "./utils.js";
-import fileParser from "./input/fileParser.js";
-import translateFiles from "./translation/translateFiles.js";
-import outputHandler from "./output/outputHandler.js";
+import { fileParser } from "./input/fileParser.js";
+import { translateFiles } from "./translation/translateFiles.js";
+import { outputHandler } from "./output/outputHandler.js";
 import argParser from "./cli/argParser.js";
 
 async function main() {
@@ -48,18 +48,20 @@ async function main() {
     // Parse files
     const parsedFiles = await fileParser(args);
 
-    // Translate files
-    const translatedFiles = await translateFiles(
-      parsedFiles,
-      targetLang,
-      getGeminiChatCompletion,
-      options.model,
-    );
+    if (parsedFiles.length) {
+      // Translate files
+      const translatedFiles = await translateFiles(
+        parsedFiles,
+        targetLang,
+        AI_PROVIDERS[provider],
+        options.model,
+      );
 
-    // Output or display translated contents
-    options.output
-      ? outputHandler(translatedFiles)
-      : displayTranslatedContents(translatedFiles);
+      // Output or display translated contents
+      options.output
+        ? outputHandler(translatedFiles)
+        : displayTranslatedContents(translatedFiles);
+    }
 
     console.log(chalk.green("====== Done ======"));
     process.exit(0);

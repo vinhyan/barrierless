@@ -1,4 +1,6 @@
 const promptContent = (fileContent, targetLang) => {
+  if (!(fileContent && fileContent.length && targetLang && targetLang.length))
+    throw new Error("Prompt and target language are required");
   return `Translate the following text to ${targetLang}:\n
           "${fileContent}\n\n"   
           Do not provide any context or additional information.`;

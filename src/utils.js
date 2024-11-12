@@ -1,11 +1,13 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 import path from "path";
-import toml from "toml";
+import * as toml from "toml";
 // Removed unused require statement
-import ISO6391 from "iso-639-1"; // for language code conversion/validation
-import { iso6393 } from "iso-639-3";
+const ISO6391 = require("iso-639-1"); // for language code conversion/validation - using require to satisfy Jest mocks
+import * as lang6393 from "iso-639-3";
 import chalk from "chalk";
-import os from "os";
-import fs from "fs";
+import * as os from "os";
+import * as fs from "node:fs";
 import process from "node:process";
 
 // Display banner
@@ -24,15 +26,14 @@ export function displayBanner() {
 // Retrieve the values within the TOML config file (.barrierless), and export them as the `config` object
 export function getConfig() {
   // Logic to read the values from the .barrierless config file in the home directory
-  // const os = require('os');
-  // const fs = require('fs');
   const __homedir = os.homedir();
 
   // Look for the relevant TOML file in home directory
   const tomlFilePath = path.join(__homedir, ".barrierless.toml");
-
+  console.log("tomlFilePath", tomlFilePath);
   // If the file doesn't exist, no need to parse the file for defaults
   if (!fs.existsSync(tomlFilePath)) {
+    console.log("uh oh its null");
     return null;
   }
 
@@ -42,8 +43,7 @@ export function getConfig() {
     config = toml.parse(configFileContent);
   } catch (error) {
     console.error(`Error reading TOML file: ${error.message}`);
-    // If there was an error with parsing an existing file, exit.
-    process.exit(1);
+    return null;
   }
 
   // Returns config values that were parsed from .barrierless.toml
@@ -52,6 +52,7 @@ export function getConfig() {
 
 // Capitalize the first letter of a string
 export function capFirstLetter(string) {
+  if (!(typeof string === "string" && string.length)) return false;
   return string
     .split(" ") // Split the string into an array of words
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first letter of each word
@@ -60,13 +61,16 @@ export function capFirstLetter(string) {
 
 // Validate target language
 export function getIso639LanguageCode(language) {
+  if (!(typeof language === "string" && language.length)) {
+    throw new Error("Invalid language. Language must be a non-empty string.");
+  }
   // Attempt to get the ISO 639-1 language code
   let targetLangCode = ISO6391.getCode(language);
   let isLangFound = targetLangCode !== "";
 
   // If the language code is not found from IOS 639-1, attempt to get the ISO 639-3 language code
   if (!isLangFound) {
-    const language6393 = iso6393.find(
+    const language6393 = lang6393.iso6393.find(
       (lang) => lang.name.toLowerCase() === language.toLowerCase(),
     );
 
@@ -86,11 +90,15 @@ export function getIso639LanguageCode(language) {
 
 // Display translated contents to console
 export function displayTranslatedContents(translatedFiles) {
+  if (!(translatedFiles && translatedFiles.length > 0)) {
+    console.log(chalk.red("No translated files to display."));
+    return false;
+  }
   console.log(chalk.blue("✅ Results:"));
 
   for (let i = 0; i < translatedFiles.length; i++) {
-    const { file_name, content } = translatedFiles[i];
-    console.log(chalk.yellow(`*** ${file_name} ***`));
+    const { file, content } = translatedFiles[i];
+    console.log(chalk.yellow(`*** ${file} ***`));
     console.log(content);
   }
 }

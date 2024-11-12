@@ -1,12 +1,13 @@
 import chalk from "chalk";
-import { parseFiles } from "./file.js";
+import { parseFiles, validateFiles } from "./file.js";
 
-export default async function fileParser(files) {
+export async function fileParser(files) {
   console.log(chalk.blue(`📂 Reading file(s)... `));
-  try {
-    const parsedFiles = await parseFiles(files);
-    return parsedFiles;
-  } catch (error) {
-    console.error(chalk.red(`*** Error: ${error.message} ***`));
+
+  if (!validateFiles(files)) {
+    throw new Error("File must be of type txt, and filename cannot be empty.");
   }
+
+  const parsedFiles = await parseFiles(files);
+  return parsedFiles;
 }

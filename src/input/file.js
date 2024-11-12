@@ -1,8 +1,9 @@
 import * as fsPromises from "node:fs/promises";
 import chalk from "chalk";
 import path, { parse } from "path";
+import PQueue from "p-queue";
 
-export function validate(file) {
+function validate(file) {
   if (file === "") return false;
   try {
     const { ext } = parse(file);
@@ -12,97 +13,55 @@ export function validate(file) {
   }
 }
 
+// Validates all files, if ONE file is invalid, return false
+export function validateFiles(files) {
+  // mostly likely not happening as files input is required
+  if (!(files && files.length > 0)) {
+    console.log(chalk.red("Invalid input. No files provided."));
+    return false;
+  }
+
+  let valid = true;
+  files.forEach((f) => {
+    if (!validate(f)) {
+      valid = false;
+      console.log(chalk.red(`Invalid file: ${f}.`));
+    }
+  });
+
+  return valid;
+}
+
 export async function parseFiles(files) {
-  if (!Array.isArray(files)) {
-    throw new Error("Invalid input. No files provided.");
+  if (!(files && files.length > 0)) {
+    throw new Error("No files provided.");
   }
 
   let parsedFiles = [];
 
-  const parseFilePromises = files.map(async (file, index) => {
-    const parsedFile = {};
-    const fileName = path.basename(file);
+  const queue = new PQueue({ concurrency: 4 }); // process (read) up to 4 files concurrently
 
-    try {
-      console.log(chalk.yellow(`   ${index + 1}/${files.length}: ${fileName}`));
-      if (!validate(file)) {
-        console.error(
-          chalk.red(
-            `Invalid file: ${file}. Filename cannot be empty, and must be a .txt file.`,
-          ),
+  files.forEach((file, index) => {
+    const { base: fileBase } = parse(file);
+
+    (async () => {
+      const parsedFile = {};
+      try {
+        console.log(
+          chalk.yellow(`   ${index + 1}/${files.length}: ${fileBase}`),
         );
-        return;
+        const fileContent = await queue.add(
+          async () => await fsPromises.readFile(file, "utf-8"),
+        );
+        parsedFile["file"] = fileBase;
+        parsedFile["content"] = fileContent;
+        parsedFiles.push(parsedFile);
+      } catch (error) {
+        console.error(chalk.red(`*** Error: ${error.message} ***`));
       }
-      const fileContent = await fsPromises.readFile(file, "utf-8");
-
-      // Store file name and file content in a key-pair object
-      parsedFile["file_name"] = fileName;
-      parsedFile["content"] = fileContent;
-      parsedFiles.push(parsedFile);
-    } catch (error) {
-      console.error(
-        chalk.red(
-          `*** Error: Unable to read "${fileName}"${files.length > 1 ? ". Skipping this file..." : ""} ***`,
-        ),
-      );
-      console.error(error.message);
-      return null;
-    }
+    })();
   });
-  // Await all promises, then filter out any nulls (failed or invalid files)
-  const resolvedFiles = await Promise.all(parseFilePromises);
-  parsedFiles = resolvedFiles.filter((file) => file !== null);
 
-  // try {
-
-  // } catch (error) {
-  //   console.error(chalk.red(`*** Error: ${error.message} ***`));
-  // }
+  await queue.onIdle();
   return parsedFiles;
 }
-
-// const parseFilePromises = [];
-
-// try {
-//   let index = 0;
-//   for await (const file of files) {
-//     // if (!validate(file)) {
-//     //   console.error(
-//     //     chalk.red(
-//     //       `Invalid file: ${file}. Filename cannot be empty, and must be a .txt file.`,
-//     //     ),
-//     //   );
-//     //   break;
-//     // }
-
-//     const parsedFile = {};
-//     const fileName = path.basename(file);
-
-//     try {
-//       console.log(
-//         chalk.yellow(`   ${index + 1}/${files.length}: ${fileName}`),
-//       );
-
-//       if (!validate(file)) {
-//         throw new Error(
-//           `Invalid file: ${file}. Filename cannot be empty, and must be a .txt file.`,
-//         );
-//       }
-
-//       const fileContent = await fs.readFile(file, "utf-8");
-//       // Store file name and file content in a key-pair object
-//       parsedFile["file_name"] = fileName;
-//       parsedFile["content"] = fileContent;
-//       parsedFiles.push(parsedFile);
-//     } catch (error) {
-//       console.error(
-//         chalk.red(
-//           `*** Error: Unable to read "${fileName}"${files.length > 1 ? ". Skipping this file..." : ""} ***`,
-//         ),
-//       );
-//       console.error(error.message);
-//     }
-//   }
-// } catch (error) {
-//   console.error(chalk.red(`*** Error: ${error.message} ***`));
-// }
