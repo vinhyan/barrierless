@@ -10,7 +10,7 @@ function validate(file) {
     if (!ext.length) throw new Error(`Error: ${file} is not a file.`);
     return ext === ".txt";
   } catch (err) {
-    console.err(chalk.red(`Error: ${err.message}`));
+    console.error(chalk.red(`Error: ${err.message}`));
     return false;
   }
 }
