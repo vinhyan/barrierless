@@ -1,6 +1,5 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
-import babelParser from "@babel/eslint-parser";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [

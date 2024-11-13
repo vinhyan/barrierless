@@ -52,7 +52,7 @@ jest.unstable_mockModule("../prompt.js", () => ({
 }));
 
 const { GoogleGenerativeAI } = await import("@google/generative-ai");
-const { getConfig } = await import("../utils.js");
+// const { getConfig } = await import("../utils.js");
 
 describe("Mock Gemini AI tests", () => {
   test("create a Gemini instance with a valid API key, return content", async () => {
@@ -67,6 +67,10 @@ describe("Mock Gemini AI tests", () => {
   test("Gemini API key is invalid, throw error", async () => {
     try {
       const genAI = new GoogleGenerativeAI("dummy_key");
+      const model = genAI.getGenerativeModel({
+        model: MODEL,
+      });
+      await model.generateContent("Hello");
     } catch (error) {
       expect(error.message).toMatch(
         "401: Unauthorized. Please provide a valid Gemini API key.",

@@ -15,12 +15,13 @@ jest.unstable_mockModule("../../src/ai/groq_ai.js", () => ({
 
 jest.unstable_mockModule("../../src/utils.js", () => ({
   getIso639LanguageCode: jest.fn().mockImplementation((lang) => {
+    if (!lang.length) return false;
     return "en";
   }),
 }));
 
 const { getGroqChatCompletion } = await import("../ai/groq_ai.js");
-const { getIso639LanguageCode } = await import("../utils.js");
+// const { getIso639LanguageCode } = await import("../utils.js");
 
 import { translateFiles } from "./translateFiles.js";
 

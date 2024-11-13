@@ -5,30 +5,22 @@ const MOCKED_GROQ_API_KEY = "123";
 const MODEL = "123";
 
 // ==========================
-const mockCreate = jest
-  .fn()
-  .mockImplementation(
-    ({
-      messages: [{ role = "user", content }],
-      model,
-      temperature = "0.2",
-    }) => {
-      const res = {
-        choices: [
-          {
-            message: {
-              content: "Mocked response: Hello",
-            },
-          },
-        ],
-      };
-      if (model === MODEL) {
-        return Promise.resolve(res);
-      } else {
-        return Promise.reject(new Error("Invalid AI model"));
-      }
-    },
-  );
+const mockCreate = jest.fn().mockImplementation((param) => {
+  const res = {
+    choices: [
+      {
+        message: {
+          content: "Mocked response: Hello",
+        },
+      },
+    ],
+  };
+  if (param.model === MODEL) {
+    return Promise.resolve(res);
+  } else {
+    return Promise.reject(new Error("Invalid AI model"));
+  }
+});
 
 jest.unstable_mockModule("groq-sdk", () => ({
   Groq: jest.fn().mockImplementation((apiKeyObj) => {
@@ -53,7 +45,7 @@ jest.unstable_mockModule("../utils.js", () => ({
 }));
 
 const { Groq } = await import("groq-sdk");
-const { getConfig } = await import("../utils.js");
+// const { getConfig } = await import("../utils.js");
 
 describe("Mock Groq AI tests", () => {
   test("create a Groq instance with a valid API key, return content", async () => {
@@ -76,6 +68,16 @@ describe("Mock Groq AI tests", () => {
   test("GROQ API key is invalid, throw error", async () => {
     try {
       const groq = new Groq({ apiKey: "dummy_key" });
+      await groq.chat.completions.create({
+        messages: [
+          {
+            role: "user",
+            content: "Hello",
+          },
+        ],
+        model: MODEL,
+        temperature: 0.2,
+      });
     } catch (error) {
       expect(error.message).toMatch(
         "401: Unauthorized. Please provide a valid GROQ API key.",

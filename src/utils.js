@@ -8,7 +8,6 @@ import * as lang6393 from "iso-639-3";
 import chalk from "chalk";
 import * as os from "os";
 import * as fs from "node:fs";
-import process from "node:process";
 
 // Display banner
 export function displayBanner() {

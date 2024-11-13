@@ -1,6 +1,6 @@
+/* global global */
 import { beforeAll, describe, expect, jest } from "@jest/globals";
 import path from "node:path";
-import chalk from "chalk";
 
 let outputDir = "";
 
@@ -31,7 +31,7 @@ jest.unstable_mockModule("node:fs/promises", () => ({
   }),
 }));
 
-const fs = await import("node:fs");
+// const fs = await import("node:fs");
 const fsPromises = await import("node:fs/promises");
 const { outputHandler } = await import("../../src/output/outputHandler");
 

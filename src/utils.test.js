@@ -1,6 +1,7 @@
-import { afterAll, describe, expect, jest, test } from "@jest/globals";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+/* global global */
+import { describe, expect, jest, test } from "@jest/globals";
+// import { createRequire } from "module";
+// const require = createRequire(import.meta.url);
 
 let homeDir = "/home/user";
 
@@ -12,7 +13,7 @@ let tomlFiles = {};
 
 jest.unstable_mockModule("node:fs", () => ({
   existsSync: jest.fn().mockImplementation((filepath) => {
-    return tomlFiles.hasOwnProperty(filepath);
+    return Object.hasOwn(tomlFiles, filepath);
   }),
   __setMockFileData: jest
     .fn()
@@ -69,8 +70,8 @@ const {
   getIso639LanguageCode,
   displayTranslatedContents,
 } = await import("./utils.js");
-const ISO6391 = require("iso-639-1");
-const { iso6393 } = await import("iso-639-3");
+// const ISO6391 = require("iso-639-1");
+// const { iso6393 } = await import("iso-639-3");
 
 describe("getConfig() tests", () => {
   const tomlFilePath = "/home/user/.barrierless.toml";
