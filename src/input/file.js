@@ -7,6 +7,7 @@ function validate(file) {
   if (file === "") return false;
   try {
     const { ext } = parse(file);
+    if (!ext.length) throw new Error(`Error: ${file} is not a file.`);
     return ext === ".txt";
   } catch (err) {
     return false;

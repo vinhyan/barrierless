@@ -20,6 +20,10 @@ const fsPromises = await import("node:fs/promises");
 const { validateFiles, parseFiles } = await import("../../src/input/file");
 
 describe("validateFiles() tests", () => {
+  test("file has empty name, return false", () => {
+    expect(validateFiles([""])).toBe(false);
+  });
+
   test("files is null, return false", () => {
     expect(validateFiles(null)).toBe(false);
   });
@@ -28,8 +32,12 @@ describe("validateFiles() tests", () => {
     expect(validateFiles([])).toBe(false);
   });
 
-  test("files contain one invalid file, return false", () => {
+  test("files contain one file that is not .txt, return false", () => {
     expect(validateFiles(["dummy_file.txt", "dummy_file.md"])).toBe(false);
+  });
+
+  test("files contain one file that is not a file (invalid), return false", () => {
+    expect(validateFiles(["im-a-string"])).toBe(false);
   });
 
   test("files contain all valid file, return true", () => {
