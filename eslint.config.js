@@ -7,7 +7,6 @@ export default [
   {
     files: ["**/*.js", "**/*.mjs"],
     languageOptions: {
-      parser: babelParser,
       globals: {
         ...globals.browser,
         ...globals.jest,
