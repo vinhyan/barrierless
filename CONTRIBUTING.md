@@ -181,6 +181,10 @@ Updating, improving and correcting the documentation
 
 -->
 
+### Testing
+
+We are using Jest as our testing tool. To learn how to set up Jest for this project that uses ESM, please read this article: [A Guide to Setting Up Jest for JavaScript Testing with ESM](https://dev.to/vinhyan/a-guide-to-setting-up-jest-for-javascript-testing-with-esm-22m6)
+
 ## Styleguides
 
 ### Prettier
