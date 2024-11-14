@@ -1,7 +1,5 @@
 /* global global */
 import { describe, expect, jest, test } from "@jest/globals";
-// import { createRequire } from "module";
-// const require = createRequire(import.meta.url);
 
 let homeDir = "/home/user";
 
@@ -69,9 +67,8 @@ const {
   capFirstLetter,
   getIso639LanguageCode,
   displayTranslatedContents,
+  displayBanner,
 } = await import("./utils.js");
-// const ISO6391 = require("iso-639-1");
-// const { iso6393 } = await import("iso-639-3");
 
 describe("getConfig() tests", () => {
   const tomlFilePath = "/home/user/.barrierless.toml";
@@ -148,21 +145,21 @@ describe("getIso639LanguageCode() tests", () => {
 
 const originalConsoleLogFn = global.console.log;
 
+let logOutput = null;
+
+function testLogFn(...args) {
+  logOutput = logOutput || [];
+  args.forEach((arg) => logOutput.push(arg));
+}
+
+function finalize(output) {
+  if (output && Array.isArray(output)) {
+    return output.join("");
+  }
+  return output;
+}
+
 describe("displayTranslatedContents() tests", () => {
-  let logOutput = null;
-
-  function testLogFn(...args) {
-    logOutput = logOutput || [];
-    args.forEach((arg) => logOutput.push(arg));
-  }
-
-  function finalize(output) {
-    if (output && Array.isArray(output)) {
-      return output.join("");
-    }
-    return output;
-  }
-
   beforeEach(() => {
     global.console.log = testLogFn;
     logOutput = null;
@@ -183,5 +180,22 @@ describe("displayTranslatedContents() tests", () => {
     displayTranslatedContents(translatedFiles);
     const expectedOutput = `${translatedFiles[0].file}`;
     expect(finalize(logOutput)).toContain(expectedOutput);
+  });
+});
+
+describe("displayBanner() tests", () => {
+  let consoleSpy;
+
+  beforeEach(() => {
+    consoleSpy = jest.spyOn(global.console, "log");
+  });
+
+  afterEach(() => {
+    consoleSpy.mockRestore();
+  });
+
+  test("display banner", () => {
+    displayBanner();
+    expect(consoleSpy).toHaveBeenCalled();
   });
 });
