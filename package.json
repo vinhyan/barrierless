@@ -12,6 +12,10 @@
   "files": [
     "src/"
   ],
+   "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinhyan/barrierless.git"
+  },
   "keywords": [],
   "author": "Vinh Nhan",
   "license": "MIT",
