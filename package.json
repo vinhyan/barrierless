@@ -1,6 +1,6 @@
 {
   "name": "barrierless",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "index.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
@@ -12,7 +12,7 @@
   "files": [
     "src/"
   ],
-   "repository": {
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/vinhyan/barrierless.git"
   },
