@@ -29,10 +29,10 @@ export function getConfig() {
 
   // Look for the relevant TOML file in home directory
   const tomlFilePath = path.join(__homedir, ".barrierless.toml");
-  console.log("tomlFilePath", tomlFilePath);
+  // console.log("tomlFilePath", tomlFilePath);
   // If the file doesn't exist, no need to parse the file for defaults
   if (!fs.existsSync(tomlFilePath)) {
-    console.log("uh oh its null");
+    // console.log("uh oh its null");
     return null;
   }
 
